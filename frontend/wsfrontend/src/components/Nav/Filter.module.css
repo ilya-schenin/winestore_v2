@@ -1,0 +1,55 @@
+@keyframes shimmer {
+    0% {
+        background-position: -200px 0;
+    }
+    100% {
+        background-position: 200px 0;
+    }
+}
+
+.FilterSkeleton {
+    margin-bottom: 20px;
+}
+
+.skeletoTitle {
+    height: 28px;
+    width: 80px;
+    background: var(--gray);
+    border-radius: 12px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.skeletonTitle {
+    margin-top: 10px;
+    height: 18px;
+    background: var(--light-gray);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+}
+
+.skeletoTitle::after,
+.skeletonTitle::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
+    animation: shimmer 3.5s infinite linear;
+}
+
+.m {
+    width: 120px;
+}
+
+.l {
+    width: 160px;
+}
+
+.s {
+    width: 80px;
+}

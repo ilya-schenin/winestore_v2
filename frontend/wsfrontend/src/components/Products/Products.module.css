@@ -1,0 +1,78 @@
+.products {
+    display: grid;
+    grid-area: prod;
+    grid-template-columns: repeat(3, 1fr);
+    width: 100%;
+}
+
+.productCard {}
+
+.productCardBody {
+    padding: 20px;
+    padding-right: 0;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200px 0;
+    }
+    100% {
+        background-position: 200px 0;
+    }
+}
+
+.skeletonImage {
+    width: 100%;
+    height: 200px;
+    background-color: var(--light-gray);
+    position: relative;
+}
+
+.skeletonTitle {
+    margin-top: 10px;
+    border-radius: 12px;
+    height: 24px;
+    width: 70%;
+    background-color: var(--gray);
+    position: relative;
+}
+
+.skeletonSubTitle {
+    margin-top: 10px;
+    border-radius: 12px;
+    height: 18px;
+    width: 80px;
+    background-color: var(--light-gray);
+    position: relative;
+}
+
+
+.skeletonPrice{
+    margin-top: 20px;
+    height: 24px;
+    border-radius: 12px;
+    width: 120px;
+    background-color: var(--gray);
+    position: relative;
+}
+
+.skeletonButton {
+    margin-top: 20px;
+    border-radius: 12px;
+    height: 36px;
+    width: 200px;
+    background-color: var(--gray);
+    position: relative;
+}
+
+.skeletonItem::after,
+.skeletonItem::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
+    animation: shimmer 3.5s infinite linear;
+}

@@ -1,0 +1,90 @@
+services:
+  userdb:
+    image: postgres:15.3
+    container_name: userdb
+    environment:
+      POSTGRES_DB: "userdb"
+      POSTGRES_USER: "userdb"
+      POSTGRES_PASSWORD: "userdb"
+    ports:
+      - "5400:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U userdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  cartdb:
+    image: postgres:15.3
+    container_name: cartdb
+    environment:
+      POSTGRES_DB: "cartdb"
+      POSTGRES_USER: "cartdb"
+      POSTGRES_PASSWORD: "cartdb"
+    ports:
+      - "5401:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cartdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  shopdb:
+    image: postgres:15.3
+    container_name: shopdb
+    environment:
+      POSTGRES_DB: "shopdb"
+      POSTGRES_USER: "shopdb"
+      POSTGRES_PASSWORD: "shopdb"
+    ports:
+      - "5402:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U shopdb" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  userapp:
+    build:
+      context: .
+      dockerfile: user/Dockerfile
+    container_name: userapp
+    volumes:
+      - ./user:/app
+    ports:
+      - "8001:8001"
+    command: >
+      sh -c "alembic upgrade head && 
+             python -u main.py"
+    depends_on:
+      userdb:
+        condition: service_healthy
+
+  cartapp:
+    build:
+      context: .
+      dockerfile: cart/Dockerfile
+    container_name: cartapp
+    volumes:
+      - ./cart:/app
+    ports:
+      - "8002:8001"
+    command: >
+      sh -c "alembic upgrade head && 
+             python -u main.py"
+    depends_on:
+      cartdb:
+        condition: service_healthy
+
+  rabbitmq:
+    image: rabbitmq:latest
+    container_name: rabbitmq
+    ports:
+       - "5672:5672"
+       - "15672:15672"
+
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6300:6379"

@@ -1,0 +1,7 @@
+.content {
+    display: grid;
+    grid-template-areas: 
+        "nav info info"
+        "nav prod prod";
+    grid-template-columns:  240px 1fr 1fr;
+}

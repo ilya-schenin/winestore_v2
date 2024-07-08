@@ -1,0 +1,25 @@
+.searchForm {
+    width: 100%;
+    display: flex;
+}
+
+.searchForm button {
+    border: 2px solid var(--gray);
+    border-left: none;
+    border-top: none;
+    color: var(--gray);
+    height: 44px;
+    margin-left: 4px;
+    border-radius: 4px;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.searchForm input {
+    border: 1px solid var(--light-gray);
+    height: 40px;
+    width: 100%;
+    border-radius: 4px;
+    font-size: 18px;
+    font-weight: 700;
+}

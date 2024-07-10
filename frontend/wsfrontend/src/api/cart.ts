@@ -119,7 +119,7 @@ export const updateCart = async ({
 
     const url = action === 'add'
         ? `http://localhost:8002/cart/add-to-cart/${product_id}`
-        : `http://localhost:8002/cart/remove-to-cart/${product_id};`;
+        : `http://localhost:8002/cart/remove-to-cart/${product_id}`;
 
     await updateServerCart(
         url, 

@@ -17,7 +17,7 @@ export const getProductsByCategory = async ({
 }: getProductsByCategoryProps): Promise<void> => {
     await axios.get('http://localhost:8003/shop/products_by_category/' + category)
         .then((r: AxiosResponse<Product[]>) => {
-            setProducts(r.data);
+            setProducts(r.data.items);
             setLoading(false);
         })
         .catch((e: AxiosError) => {

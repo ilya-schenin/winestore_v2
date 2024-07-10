@@ -28,12 +28,14 @@ TIME_DAY = 86400
 
 @router.get('/products_all/', response_model=Page[ProductModel])
 async def all_products(async_session: AsyncSession = Depends(get_db)):
-    cache = get_cache()
-    products = await get_or_cache_all_products(
-        cache=cache,
-        async_session=async_session
-    )
-    return paginate(products)
+    # cache = get_cache()
+    p_orm = ProductORM(async_session)
+    p = await p_orm.all()
+    # products = await get_or_cache_all_products(
+    #     cache=cache,
+    #     async_session=async_session
+    # )
+    return paginate(p)
 
 
 # @router.get('/categories_detail/{category_slug}', response_model=list[CategoryModel])
@@ -60,7 +62,7 @@ async def all_categories(async_session: AsyncSession = Depends(get_db)):
     return categories_all
 
 
-@router.get('/products_by_category/{category_slug}', response_model=list[ProductModel])
+@router.get('/products_by_category/{category_slug}', response_model=Page[ProductModel])
 async def products_by_category(category_slug: str, async_session: AsyncSession = Depends(get_db)):
     cache = get_cache()
     categories = await get_or_cache_category_detail(
@@ -68,13 +70,16 @@ async def products_by_category(category_slug: str, async_session: AsyncSession =
         category_slug=category_slug,
         async_session=async_session
     )
-    products = await get_or_cache_products_by_category(
-        cache=cache,
-        category_slug=category_slug,
-        async_session=async_session,
-        categories=categories
-    )
-    return products
+    # products = await get_or_cache_products_by_category(
+    #     cache=cache,
+    #     category_slug=category_slug,
+    #     async_session=async_session,
+    #     categories=categories
+    # )
+    porm = ProductORM(async_session=async_session)
+    products = await porm.filter_in_category(categories)
+    print(products)
+    return paginate(products)
 
 
 @router.get('/product_detail/{product_slug}', response_model=ProductModel)
@@ -103,7 +108,6 @@ async def products_filter(
     filter_manager = ItemFilterManager()
     filter_dict = filters.dict()
     result = await filter_manager.apply_filters(filter_dict, async_session)
-    print([ProductModel.from_orm(row).dict() for row in result])
-    return paginate([ProductModel.from_orm(row).dict() for row in result])
+    return paginate(result)
 
 

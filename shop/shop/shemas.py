@@ -41,6 +41,11 @@ class CountryModel(BaseOption):
     pass
 
 
+class Image(BaseModel):
+    img: str
+    npp: int
+
+
 class ProductModel(BaseModel):
     id: str
     volume: float
@@ -48,8 +53,9 @@ class ProductModel(BaseModel):
     npp: int
     name: str
     slug: str
-    description: str
-    strenght: float
+    description: str | None
+    strenght: float | None
+    images: list[Image | list]
     color_vine: Optional[ColorVineModel] | str
     color_beer: Optional[ColorBeerModel] | str
     category: Optional[CountryModel] | str
@@ -58,6 +64,7 @@ class ProductModel(BaseModel):
 
     class Config:
         from_attributes = True
+        arbitrary_types_allowed = True
 
 
 class ItemFilter(BaseModel):

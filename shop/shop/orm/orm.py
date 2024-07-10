@@ -17,7 +17,8 @@ class ProductORM(BaseORM[Product]):
             selectinload(Product.country),
             selectinload(Product.color_vine),
             selectinload(Product.color_beer),
-            selectinload(Product.sugar)
+            selectinload(Product.sugar),
+            selectinload(Product.images)
         ]
 
     async def all(self):
@@ -62,7 +63,7 @@ class ProductORM(BaseORM[Product]):
         )
         result = await self.async_session.execute(query)
         data = result.scalars().all()
-        return [ProductModel.from_orm(row).dict() for row in data]
+        return data
 
 
 class CategoryOrm(BaseORM[Category]):

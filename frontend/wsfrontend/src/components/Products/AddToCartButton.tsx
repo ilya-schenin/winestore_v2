@@ -3,6 +3,9 @@ import { Cart, Product } from "@/api/interfaces";
 import styles from './Products.module.css';
 import { updateCart } from "@/api/cart";
 import { useDispatch } from "react-redux";
+import { Button } from "../Button/Button";
+import cn from 'classnames';
+
 
 interface AddToCartButtonProps {
     product: Product,
@@ -21,6 +24,10 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({ product, cart 
         const item: Cart | undefined = cart.find((i: Cart) => i.product_id === product.id);        
         item?.quantity && setQuantity(item.quantity); 
     };
+
+    useEffect(() => {
+        errors && setTimeout(() => setErrors(null), 1000);
+    }, [errors]);
 
     useEffect (() => {
         product && cart && handleQuantity(product, cart);
@@ -42,7 +49,10 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({ product, cart 
                         setQuantity
                     });
                 }}>-</div>
-                <div className={styles.quantity}>{quantity}</div>
+                <div className={cn({
+                    [styles.quantity]: loading,
+                    [styles.errors]: errors
+                    })}>{quantity}</div>
                 <div className={styles.add} onClick={() => {
                     const product_id = product.id;
                     const action = 'add';
@@ -61,7 +71,7 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({ product, cart 
     }
 
     return (
-        <button onClick={() => {
+        <Button title="Добавить в корзину" typeOf="primary" onClick={() => {
             const product_id = product.id;
             const action = 'add';
             updateCart({
@@ -73,6 +83,6 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({ product, cart 
                 setLoading, 
                 setQuantity
             });
-        }}>Добавить в корзину</button>
+        }} />
     );
 };

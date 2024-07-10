@@ -29,6 +29,11 @@ interface ProductRelation {
     name: string | null
 }
 
+interface Image {
+    img: string,
+    npp: number
+}
+
 export interface Product {
     id: string,
     category: ProductRelation,
@@ -43,7 +48,7 @@ export interface Product {
     price: string | number,
     strenght: string | number,
     npp: number,
-    // image: string,
+    images: Image[],
     min_price: string | number,
     min_old_price: string | number
 }

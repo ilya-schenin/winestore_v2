@@ -53,3 +53,7 @@
 .s {
     width: 80px;
 }
+
+.filter h2 {
+    color: var(--primary-dark);
+}

@@ -1,5 +1,5 @@
 from typing import Annotated
-from sqlalchemy import BigInteger, String, ForeignKey, Float, DECIMAL, DateTime
+from sqlalchemy import BigInteger, String, ForeignKey, Float, DECIMAL, DateTime, Integer
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, relationship, declared_attr
 import datetime
 
@@ -61,10 +61,17 @@ class Image(Base):
     __tablename__ = 'shop_image'
     id: Mapped[bigintpk]
     owner: Mapped[str]
-    code_owner: Mapped[short_string]
+    code_owner: Mapped[strpk] = mapped_column(ForeignKey('shop_product.id'))
     img: Mapped[str]
     img_name: Mapped[str]
     npp: Mapped[int]
+    product: Mapped["Product"] = relationship("Product", back_populates="images")
+
+    def __str__(self):
+        return self.id
+
+    def __repr__(self):
+        return self.img_name
 
 
 class BaseProductOptions:
@@ -155,12 +162,16 @@ class Product(
     )
 
     description: Mapped[str] = mapped_column(
-        String(500),
+        String(2500),
         nullable=True
     )
-    price: Mapped[float] = mapped_column(Float())
-    strenght: Mapped[float]
-    npp: Mapped[int]
+    images: Mapped[list["Image"]] = relationship(
+        "Image",
+        back_populates="product"
+    )
+    price: Mapped[float] = mapped_column(Float(), nullable=True)
+    strenght: Mapped[float] = mapped_column(Float(), nullable=True)
+    npp: Mapped[int] = mapped_column(Integer(), nullable=True)
 
 
 class ShopProduct(Base):

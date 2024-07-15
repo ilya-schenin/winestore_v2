@@ -20,8 +20,8 @@ export const metadata: Metadata = {
 export default function ProductsPage({ params }: ProductsPageProps) {
     return (
       <div className={styles.content}>
-        <Nav />
-        <InfoLabel />
+        <Nav category={params.categorySlug} />
+        <InfoLabel category={params.categorySlug} />
         <Products category={params.categorySlug} />
       </div>
     );

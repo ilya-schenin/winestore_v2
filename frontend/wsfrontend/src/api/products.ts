@@ -1,23 +1,45 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
-import { Product } from "./interfaces";
+import { ProductResponse } from "./interfaces";
 
 
-type getProductsByCategoryProps = {
-    category: string,
-    setProducts: React.Dispatch<React.SetStateAction<Product[] | null>>,
-    setErrors: React.Dispatch<React.SetStateAction<string | null>>,
-    setLoading:  React.Dispatch<React.SetStateAction<boolean>>
+interface GetProductsProps {
+    category?: string;
+    searchParams?: URLSearchParams;
+    setProducts: React.Dispatch<React.SetStateAction<ProductResponse | null>>;
+    setErrors: React.Dispatch<React.SetStateAction<string | null>>;
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const getProductsByCategory = async ({
+
+export const getProducts = async ({
     category,
-    setErrors,
+    searchParams,
     setProducts,
+    setErrors,
     setLoading
-}: getProductsByCategoryProps): Promise<void> => {
-    await axios.get('http://localhost:8003/shop/products_by_category/' + category)
-        .then((r: AxiosResponse<Product[]>) => {
-            setProducts(r.data.items);
+}: GetProductsProps): Promise<void> => {
+
+    let params;
+    let url: string = '';
+    setLoading(true);
+    
+    if (searchParams) {
+        params = new URLSearchParams(searchParams.toString())
+        params.set('size', '21')
+    } else {
+        params = new URLSearchParams()
+        params.set('size', '21')
+    }
+    category && (
+        url = `http://localhost:8003/shop/products_by_category/${category}?${params.toString()}`
+    );
+    searchParams && (
+        url = `http://localhost:8003/shop/products_filter/?${params.toString()}`
+    );
+
+    await axios.get(url)
+        .then((r: AxiosResponse<ProductResponse>) => {
+            setProducts(r.data);
             setLoading(false);
         })
         .catch((e: AxiosError) => {

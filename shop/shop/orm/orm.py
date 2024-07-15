@@ -21,9 +21,10 @@ class ProductORM(BaseORM[Product]):
             selectinload(Product.images)
         ]
 
-    async def all(self):
+    async def all(self, order_by=Product.npp):
         query = (
             select(Product)
+            .order_by(order_by)
             .options(
                 *self.product_options()
             )
@@ -31,10 +32,11 @@ class ProductORM(BaseORM[Product]):
         result = await self.async_session.execute(query)
         return result.scalars().all()
 
-    async def products__in(self, array: list):
+    async def products__in(self, array: list, order_by=Product.npp):
         query = (
             select(Product)
             .filter(Product.id.in_(array))
+            .order_by(order_by)
             .options(
                 *self.product_options()
             )

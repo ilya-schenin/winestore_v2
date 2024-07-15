@@ -54,6 +54,30 @@
     width: 80px;
 }
 
+.filter {
+    margin-bottom: 30px;
+}
 .filter h2 {
+    color: var(--primary-dark);
+}
+
+.formFilter {
+    margin-top: 10px;
+    font-size: 18px;
+}
+
+.formFilter input[type="checkbox"] {
+    height: 20px;
+    width: 20px;
+    vertical-align: middle;
+}
+
+.formFilter input[type="checkbox"]:checked {
+    accent-color: var(--primary);
+}
+
+
+.formFilter label {
+    margin-top: 10px;
     color: var(--primary-dark);
 }

@@ -2,6 +2,7 @@
     display: grid;
     grid-template-areas: 
         "nav info info"
-        "nav prod prod";
+        "nav prod prod"
+        "nav pag pag";
     grid-template-columns:  240px 1fr 1fr;
 }

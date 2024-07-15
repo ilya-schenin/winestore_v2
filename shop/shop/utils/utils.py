@@ -1,11 +1,15 @@
 from fastapi.security import HTTPBearer
+from starlette import status
+
 from shop.db import get_db
+from shop.models import Product, Category, Country
 from shop.orm.orm import ProductORM, CategoryOrm
 from fastapi import APIRouter, Depends
 from settings import get_cache
 from sqlalchemy.ext.asyncio import AsyncSession
 from shop.shemas import ProductModel, CategoryModel
-
+from sqlalchemy import select, func
+from fastapi import HTTPException
 
 TIME_DAY = 86400
 
@@ -78,4 +82,51 @@ async def get_or_cache_products_by_category(
         )
         return products
     return cached_products_category
+
+
+async def _get_categories_id(async_session, category_slug):
+    category_orm = CategoryOrm(async_session=async_session)
+    categories_data = await category_orm.filter(
+        slug=category_slug
+    )
+    categories_id = [
+        item['id'] for item in categories_data
+    ]
+    return categories_id
+
+
+async def get_or_cache_product_minmax(category_slug: str, async_session: AsyncSession, field: Product):
+    categories_id = await _get_categories_id(async_session, category_slug)
+    if len(categories_id) != 0:
+        query = select(
+            func.min(field), func.max(field)
+        ).filter(
+            Product.category_id.in_(categories_id)
+        )
+        result = await async_session.execute(query)
+        return result.one()
+    if category_slug == '/':
+        query = select(
+            func.min(field), func.max(field)
+        )
+        result = await async_session.execute(query)
+        return result.one()
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail='invalid category'
+    )
+
+
+async def get_or_cache_countries(category_slug: str, async_session: AsyncSession):
+    categories_id = await _get_categories_id(
+        async_session, category_slug
+    )
+    query = (
+        select(Country.name)
+        .join(Product, Product.country_id == Country.id)
+        .where(Product.category_id.in_(categories_id)).distinct()
+    )
+    result = await async_session.execute(query)
+    return result.scalars().all()
 

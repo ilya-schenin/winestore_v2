@@ -17,6 +17,7 @@ import { useAppDispatch } from '../../../redux-toolkit/hooks';
 import { toggleModal } from "../../../redux-toolkit/slices/authSlice";
 import { getCurrentUser, logoutUser } from "@/api/auth";
 import cn from 'classnames';
+import { setLabelCategories } from "../../../redux-toolkit/slices/labelSlice";
 
 const orderCats = {
     'Безалкогольные напитки': '4',
@@ -80,6 +81,10 @@ export const Header: React.FC =  () => {
         getCategoriesAll(setCategories);
         getCurrentUser(setUser);
     }, []);
+
+    useEffect(() => {
+        dispatch(setLabelCategories({categories:  categories}));
+    }, [categories, dispatch]);
 
     return (
         <header className={styles.header}>

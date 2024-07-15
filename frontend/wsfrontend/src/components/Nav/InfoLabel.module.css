@@ -3,7 +3,6 @@
     height: 160px;
     background: rgb(245, 245, 245);
     border-top-right-radius: 12px;
-    border-bottom-right-radius: 12px;
 }
 
 .InfoLabelBody {
@@ -52,6 +51,24 @@
     position: relative;
 }
 
+.title {
+    font-size: 24px;
+}
+
+.title span {
+    font-size: 14px;
+    color: var(--gray);
+}
+
+.sortButton {
+    background: none;
+    border: 2px solid var(--primary);
+    border-radius: 4px;
+    color: var(--primary);
+    font-size: 16px;
+    padding: 6px;
+}
+
 .skeletonTitle::after,
 .skeletonTitle::after {
     content: "";
@@ -68,13 +85,22 @@
     width: 180px;
 }
 
-.sortArea{
+.sortAreaSkeleton{
     margin-top: 20px;
     display: flex;
     width: 520px;
     justify-content: space-between;
     align-items: center;
 }
+
+.sortArea {
+    margin-top: 20px;
+    display: flex;
+    width: 450px;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .sortBlocks {
     display: flex;
     width: 300px;
@@ -83,4 +109,10 @@
 }
 .sortBlock {
     width: 80px;
+}
+
+.active {
+    background-color: var(--primary-dark);
+    color: white;
+    border: none;
 }

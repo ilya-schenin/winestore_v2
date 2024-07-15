@@ -57,3 +57,12 @@ export interface Cart {
     product_id: string,
     quantity: number
 }
+
+
+export interface ProductResponse {
+    items: Product[],
+    total: number,
+    page: number,
+    size: number,
+    pages: number
+}

@@ -21,14 +21,9 @@ class CategoryFilter(BaseFilter):
         return query.filter(Product.category_id.in_(categories_id))
 
 
-class PriceMinFilter(BaseFilter):
-    async def apply(self, query, value: float, async_session):
-        return query.filter(Product.price >= value)
-
-
-class PriceMaxFilter(BaseFilter):
-    async def apply(self, query, value: float, async_session):
-        return query.filter(Product.price <= value)
+class PriceFilter(BaseFilter):
+    async def apply(self, query, value: list[float], async_session):
+        return query.filter(Product.price >= value[0], Product.price <= value[1])
 
 
 class CountryFilter(BaseFilter):
@@ -74,15 +69,24 @@ class ColorBeerFilter(BaseFilter):
 
 class StrengthFilter(BaseFilter):
     async def apply(self, query, value: list[float], async_session):
-        return query.filter(Product.strenght.in_(value))
+        return query.filter(Product.strenght >= value[0], Product.strenght <= value[1])
+
+
+def order_by_product(value):
+    match value:
+        case 'top':
+            return Product.price
+        case 'bottom':
+            return Product.price.desc()
+        case _:
+            return Product.npp
 
 
 class ItemFilterManager:
     def __init__(self):
         self.__filters = {
             'category': CategoryFilter(),
-            'price_min': PriceMinFilter(),
-            'price_max': PriceMaxFilter(),
+            'price': PriceFilter(),
             'country': CountryFilter(),
             'sugar': SugarFilter(),
             'color_vine': ColorVineFilter(),
@@ -122,7 +126,7 @@ class ItemFilterManager:
             async_session=async_session
         )
         products = await product_orm.products__in(
-            result.scalars().all()
+            result.scalars().all(), order_by=order_by_product(filters['sort'])
         )
         return products
 

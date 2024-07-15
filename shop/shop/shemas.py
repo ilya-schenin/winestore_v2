@@ -76,3 +76,8 @@ class ItemFilter(BaseModel):
     color_vine: Optional[List[str]] = None
     color_beer: Optional[List[str]] = None
     strength: Optional[List[float]] = None
+
+
+class RangeFilter(BaseModel):
+    min_value: float
+    max_value: float

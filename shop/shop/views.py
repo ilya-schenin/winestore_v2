@@ -1,7 +1,8 @@
+import re
 from typing import Optional, List
 
 from fastapi.security import HTTPBearer
-from pydantic import BaseModel, conlist, Field
+from pydantic import BaseModel, conlist, Field, field_validator
 
 from shop.db import get_db
 from shop.models import Product
@@ -9,13 +10,15 @@ from shop.orm.orm import ProductORM, CategoryOrm
 from fastapi import APIRouter, Depends, Query, HTTPException
 from settings import get_cache
 from sqlalchemy.ext.asyncio import AsyncSession
-from shop.shemas import ProductModel, CategoryModel
+from shop.shemas import ProductModel, CategoryModel, RangeFilter, CountryModel
 from shop.utils.product_filter import ItemFilterManager
 from shop.utils.utils import (
     get_or_cache_all_products,
     get_or_cache_category_detail,
     get_or_cache_all_categories,
-    get_or_cache_products_by_category
+    get_or_cache_products_by_category,
+    get_or_cache_product_minmax,
+    get_or_cache_countries
 )
 from fastapi_pagination import Page, add_pagination, paginate
 
@@ -78,7 +81,6 @@ async def products_by_category(category_slug: str, async_session: AsyncSession =
     # )
     porm = ProductORM(async_session=async_session)
     products = await porm.filter_in_category(categories)
-    print(products)
     return paginate(products)
 
 
@@ -90,24 +92,71 @@ async def product_detail(product_slug: str, async_session: AsyncSession = Depend
 
 
 class ProductFilter(BaseModel):
+    price: Optional[list[float | int]] = None
+    strength: Optional[list[float | int]] = None
     category: Optional[str] = None
-    price_min: Optional[float] = Query(None, description="Minimum price")
-    price_max: Optional[float] = Query(None, description="Maximum price")
-    country: Optional[List[str]] = None
-    sugar: Optional[List[str]] = None
-    color_vine: Optional[List[str]] = None
-    color_beer: Optional[List[str]] = None
-    strength: Optional[List[float]] = None
+    country: Optional[list[str]] = None
+    sugar: Optional[list[str]] = None
+    color_vine: Optional[list[str]] = None
+    color_beer: Optional[list[str]] = None
+    sort: Optional[str] = None
 
 
-@router.post('/products_filter/', response_model=Page[ProductModel])
+def parse_query_param(param: Optional[str]) -> Optional[List[str]]:
+    if param is None:
+        return None
+    return re.split(r'\s*,\s*', param.strip('"'))
+
+
+@router.get('/products_filter/', response_model=Page[ProductModel])
 async def products_filter(
-        filters: ProductFilter,
+        price: Optional[str] = Query(None),
+        strength: Optional[str] = Query(None),
+        category: Optional[str] = Query(None),
+        country: Optional[str] = Query(None),
+        sugar: Optional[str] = Query(None),
+        color_vine: Optional[str] = Query(None),
+        color_beer: Optional[str] = Query(None),
+        sort: Optional[str] = Query('npp'),
         async_session: AsyncSession = Depends(get_db)
 ):
+    filters = ProductFilter(
+        price=parse_query_param(price),
+        strength=parse_query_param(strength),
+        category=category,
+        country=parse_query_param(country),
+        sugar=parse_query_param(sugar),
+        sort=sort,
+        color_vine=parse_query_param(color_vine),
+        color_beer=parse_query_param(color_beer)
+    )
     filter_manager = ItemFilterManager()
-    filter_dict = filters.dict()
+    filter_dict = filters.dict(exclude_unset=True)
     result = await filter_manager.apply_filters(filter_dict, async_session)
     return paginate(result)
+
+
+@router.get('/price_filter/{category_slug}', response_model=RangeFilter)
+async def price_filter(category_slug: str, async_session=Depends(get_db)):
+    prices = await get_or_cache_product_minmax(category_slug, async_session, Product.price)
+    return {
+        'min_value': prices[0],
+        'max_value': prices[1]
+    }
+
+
+@router.get('/strength_filter/{category_slug}', response_model=RangeFilter)
+async def price_filter(category_slug: str, async_session=Depends(get_db)):
+    strenght = await get_or_cache_product_minmax(category_slug, async_session, Product.strenght)
+    return {
+        'min_value': strenght[0],
+        'max_value': strenght[1]
+    }
+
+
+@router.get('/country_filter/{category_slug}', response_model=list[str])
+async def country_filter(category_slug: str, async_session=Depends(get_db)):
+    countries = await get_or_cache_countries(category_slug, async_session)
+    return [item for item in countries]
 
 
